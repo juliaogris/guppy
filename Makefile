@@ -50,21 +50,23 @@ lint:  ## Lint go source code
 .PHONY: lint
 
 # --- Docker ---------------------------------------------------------------------
+docker-build-%:  ## Build docker containers
+	docker build -f $*.Dockerfile --build-arg VERSION=$(VERSION) -t $* .
 
-docker-build:  ## Build docker containers
-	docker build -f rguide.Dockerfile --build-arg VERSION=$(VERSION) -t routeguide .
+docker-run-%:  ## Run docker containers
+	docker run --rm -p 9090:9090 $*
 
-docker-run:  ## Run docker containers
-	docker run --rm -p 9090:9090 routeguide
-
-docker-build-release:
+docker-build-release-%:
 	docker buildx build \
-		-f rguide.Dockerfile \
+		-f $*.Dockerfile \
 		--build-arg VERSION=$(VERSION) \
 		--push \
-		--tag julia/routeguide:$(VERSION) .
+		--tag julia/$*:$(VERSION) .
 
-.PHONY: lint
+docker-build-release: docker-build-release-routeguide docker-build-release-echo
+
+
+.PHONY: docker-build-release
 
 # --- Protos -------------------------------------------------------------------
 PROTO_DIR = protos
@@ -81,7 +83,7 @@ PROTOC_GO_FLAGS = \
 ci-protos: install-proto-tools vendor-protos check-protos
 
 protos:  ## Generate go files from proto and gRPC definitions
-	protoc $(PROTOC_GO_FLAGS) protos/bank/*.proto
+	protoc $(PROTOC_GO_FLAGS) protos/echo/*.proto
 	protoc $(PROTOC_GO_FLAGS) protos/rguide/routeguide.proto
 	@goimports -w $(PKG_GEN_DIRS)
 
@@ -102,8 +104,8 @@ vendor-protos:
 	curl -fsSL --create-dirs -o $(PROTO_VENDOR_DIR)/google/protobuf/descriptor.proto https://github.com/protocolbuffers/protobuf/raw/master/src/google/protobuf/descriptor.proto
 
 clean::
-	rm -rf $(PKG_GEN_DIRS)*.pb.go
-	rm -rf $(PKG_GEN_DIRS)*.pb.gw.go
+	rm -rf $(addsuffix *.pb.go,$(PKG_GEN_DIRS))
+	rm -rf $(addsuffix *.pb.gw.go,$(PKG_GEN_DIRS))
 	rm -rf $(PROTO_VENDOR_DIR)
 
 .PHONY: check-protos ci-protos install-proto-tools protos vendor-protos

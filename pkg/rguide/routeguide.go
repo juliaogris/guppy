@@ -44,6 +44,18 @@ func (s *RGServer) GetFeature(ctx context.Context, point *Point) (*Feature, erro
 	return &Feature{Location: point}, nil
 }
 
+// GetDefaultFeature returns the feature at the given point.
+func (s *RGServer) GetDefaultFeature(ctx context.Context, point *Point) (*Feature, error) {
+	feature := &Feature{
+		Name: "home",
+		Location: &Point{
+			Lat:  333,
+			Long: 333,
+		},
+	}
+	return feature, nil
+}
+
 // ListFeatures lists all features contained within the given bounding Rectangle.
 func (s *RGServer) ListFeatures(rect *Rectangle, stream RouteGuide_ListFeaturesServer) error {
 	for _, feature := range s.savedFeatures {

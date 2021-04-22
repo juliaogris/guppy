@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package echo;
+option go_package = "github.com/juliaogris/guppy/pkg/echo";
+import "google/api/annotations.proto";
+
+// Echo service.
+service Echo {
+  // Hello greets.
+  rpc Hello (HelloRequest) returns (HelloResponse) {
+    option (google.api.http) = { post:"/api/echo/hello" body:"*" };
+  };
+  // HeeloStream greets repeatedly.
+  rpc HelloStream (HelloRequest) returns (stream HelloResponse) {
+    option (google.api.http) = { post:"/api/echo/stream" body:"*" };
+  };
+}
+
+message HelloRequest {
+  string message = 1;
+}
+
+message HelloResponse {
+  string response = 1;
+}
+
