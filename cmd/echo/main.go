@@ -24,7 +24,7 @@ type config struct {
 func main() {
 	cfg := &config{}
 	_ = kong.Parse(cfg, kong.Vars{"version": version})
-	fmt.Println("starting route guide server on", cfg.Address)
+	fmt.Println("starting echo guide server on", cfg.Address)
 	if err := run(cfg.Address); err != nil {
 		log.Fatal(err)
 	}
