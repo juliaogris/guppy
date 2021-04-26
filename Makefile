@@ -23,7 +23,10 @@ GO_LDFLAGS = -X main.version=$(VERSION)
 build: | $(O)  ## Build binaries of directories in ./cmd to out/
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(GO_CMDS)
 
-.PHONY: build install run run-server run-server-gw
+run-%: build
+	$(O)/$*
+
+.PHONY: build
 
 # --- Test ---------------------------------------------------------------------
 COVERFILE = $(O)/coverage.txt
