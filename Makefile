@@ -23,7 +23,7 @@ GO_LDFLAGS = -X main.version=$(VERSION)
 build: | $(O)  ## Build binaries of directories in ./cmd to out/
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(GO_CMDS)
 
-run-%: build
+run-%: build  ## Run gRPC servers [rguide|echo]
 	$(O)/$*
 
 .PHONY: build
