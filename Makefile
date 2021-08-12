@@ -64,7 +64,9 @@ docker-build-release-%:
 		-f $*.Dockerfile \
 		--build-arg VERSION=$(VERSION) \
 		--push \
-		--tag julia/$*:$(VERSION) .
+		--tag julia/$*:$(VERSION) \
+		--tag julia/$*:latest \
+		.
 
 docker-build-release: docker-build-release-routeguide docker-build-release-echo
 
