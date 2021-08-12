@@ -43,7 +43,7 @@ cover: test  ## Show test coverage in your browser
 CHECK_COVERAGE = awk -F '[ \t%]+' '/^total:/ {print; if ($$3 < $(COVERAGE)) exit 1}'
 FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_NORMAL)'; exit 1; }
 
-.PHONY: build-test check-coverage cover test test-short
+.PHONY: check-coverage cover test
 
 # --- Lint ---------------------------------------------------------------------
 
@@ -59,19 +59,24 @@ docker-build-%:  ## Build docker containers
 docker-run-%:  ## Run docker containers
 	docker run --rm -p 9090:9090 $*
 
-docker-build-release-%:
-	docker buildx build \
-		-f $*.Dockerfile \
-		--build-arg VERSION=$(VERSION) \
-		--push \
-		--tag julia/$*:$(VERSION) \
-		--tag julia/$*:latest \
-		.
-
-docker-build-release: docker-build-release-routeguide docker-build-release-echo
-
-
 .PHONY: docker-build-release
+
+# --- Release -------------------------------------------------------------------
+NEXTTAG := $(shell { git tag --list --merged HEAD --sort=-v:refname; echo v0.0.0; } | grep -E "^v?[0-9]+.[0-9]+.[0-9]+$$" | head -n1 | awk -F . '{ print $$1 "." $$2 "." $$3 + 1 }')
+
+DOCKER_LOGIN = printenv DOCKER_PASSWORD | docker login --username "$(DOCKER_USERNAME)" --password-stdin
+docker-push = docker buildx build -f $(1).Dockerfile --build-arg VERSION=$(VERSION) --push --tag julia/$(1):$(VERSION) --tag julia/$(1):latest .
+
+release: VERSION = $(NEXTTAG)
+release:
+	git tag $(NEXTTAG)
+	git push origin $(NEXTTAG)
+	goreleaser release --rm-dist
+	[ -z "$(DOCKER_PASSWORD)" ] || $(DOCKER_LOGIN)
+	$(call docker-push,echo)
+	$(call docker-push,routeguide)
+
+.PHONY: release
 
 # --- Protos -------------------------------------------------------------------
 PROTO_DIR = protos
