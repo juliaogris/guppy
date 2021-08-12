@@ -71,7 +71,7 @@ release: VERSION = $(NEXTTAG)
 release:
 	git tag $(NEXTTAG)
 	git push origin $(NEXTTAG)
-	goreleaser release --rm-dist
+	goreleaser release
 	[ -z "$(DOCKER_PASSWORD)" ] || $(DOCKER_LOGIN)
 	$(call docker-push,echo)
 	$(call docker-push,routeguide)

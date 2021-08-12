@@ -1,0 +1,6 @@
+builds:
+- id: echo
+  main: ./cmd/echo/main.go
+- id: rguide
+  main: ./cmd/rguide/main.go
+  binary: routeguide
