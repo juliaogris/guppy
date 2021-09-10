@@ -6,6 +6,8 @@ package echo
 import (
 	"context"
 	"fmt"
+
+	"google.golang.org/grpc/metadata"
 )
 
 // Server implements the server-side of gRPC demo Phone service.
@@ -14,7 +16,9 @@ type Server struct {
 }
 
 // Hello is a demo echo service.
-func (*Server) Hello(_ context.Context, req *HelloRequest) (*HelloResponse, error) {
+func (*Server) Hello(ctx context.Context, req *HelloRequest) (*HelloResponse, error) {
+	md, exists := metadata.FromIncomingContext(ctx)
+	fmt.Println("Metadata", md, "exists", exists)
 	resp := &HelloResponse{Response: fmt.Sprintf("And to you: %s", req.Message)}
 	return resp, nil
 }
