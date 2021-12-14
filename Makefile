@@ -95,6 +95,7 @@ ci-protos: install-proto-tools vendor-protos check-protos
 protos:  ## Generate go files from proto and gRPC definitions
 	protoc $(PROTOC_GO_FLAGS) protos/echo/*.proto
 	protoc $(PROTOC_GO_FLAGS) protos/rguide/routeguide.proto
+	protoc $(PROTOC_GO_FLAGS) protos/dummy/dummy.proto
 	@goimports -w $(PKG_GEN_DIRS)
 
 check-protos: protos  ## Check that generated proto and gRPC code is up-to-date

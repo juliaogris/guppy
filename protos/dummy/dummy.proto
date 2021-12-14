@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package dummy;
+option go_package = "github.com/juliaogris/guppy/pkg/dummy";
+
+// Dummy service so a second service in same container / deployment can be tested.
+service Dummy {
+  rpc Say(SayRequest) returns (SayResponse) {}
+}
+
+message SayRequest {
+  string word = 1;
+}
+
+message SayResponse {
+  string double_word = 1;
+}
